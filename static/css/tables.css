@@ -1,0 +1,182 @@
+/* Busca, tabelas, ações e paginação de registros. */
+.table-panel {
+  padding: 20px 0 0;
+}
+
+.table-panel > .panel-heading {
+  padding: 0 20px;
+}
+
+.count-badge {
+  display: inline-grid;
+  min-width: 20px;
+  height: 19px;
+  place-items: center;
+  border-radius: 20px;
+  color: #7065cf;
+  background: #f0eeff;
+  font: 600 9px "DM Sans", sans-serif;
+}
+
+.table-toolbar {
+  align-items: center;
+}
+
+.search-form {
+  display: flex;
+  width: min(270px, 45%);
+  height: 36px;
+  align-items: center;
+  gap: 7px;
+  padding: 0 8px 0 10px;
+  border: 1px solid #e9eaf1;
+  border-radius: 7px;
+  color: #9a9dac;
+}
+
+.search-form > span {
+  font-size: 18px;
+}
+
+.search-form input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  color: var(--ink);
+  background: transparent;
+  font-size: 10px;
+}
+
+.search-form button {
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 5px;
+  color: #6458c9;
+  background: #f2f0ff;
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  white-space: nowrap;
+}
+
+th {
+  height: 39px;
+  padding: 0 14px;
+  color: #a1a4b0;
+  background: #fafbfc;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .75px;
+}
+
+td {
+  height: 59px;
+  padding: 8px 14px;
+  border-top: 1px solid #f0f1f5;
+  color: #73778a;
+  font-size: 10px;
+}
+
+td:first-child, th:first-child {
+  padding-left: 20px;
+}
+
+td:last-child, th:last-child {
+  padding-right: 20px;
+}
+
+.table-product {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.table-product > span:last-child {
+  display: grid;
+  gap: 4px;
+}
+
+.table-product strong, td > strong {
+  color: #33354a;
+  font-size: 10px;
+}
+
+.table-product small {
+  color: #9a9dac;
+  font-size: 9px;
+}
+
+.stock-number {
+  color: #42455b;
+  font-weight: 600;
+}
+
+.stock-low {
+  color: #d27a36;
+}
+
+.table-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.table-actions form {
+  margin: 0;
+}
+
+.table-action {
+  display: grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  border: 1px solid #ececf3;
+  border-radius: 6px;
+  color: #73778a;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+}
+
+.table-action:hover {
+  border-color: #e1ddff;
+  color: var(--purple);
+  background: #f7f6ff;
+}
+
+.table-action-danger:hover {
+  border-color: #e8babc;
+  color: #b6424c;
+  background: #fff0f0;
+}
+
+.large-empty {
+  min-height: 275px;
+}
+
+.large-empty .empty-icon {
+  width: 43px;
+  height: 43px;
+  font-size: 21px;
+}
+
+.large-empty strong {
+  font-size: 13px;
+}
+
+.large-empty p {
+  margin: 7px 0 15px;
+  font-size: 11px;
+}
+

@@ -1,0 +1,258 @@
+/* Controles do tema e regras de aparência para o tema escuro. */
+[hidden] {
+  display: none !important;
+}
+
+.dashboard-actions, .topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  min-height: 35px;
+  align-items: center;
+  gap: 7px;
+  padding: 0 11px;
+  border: 1px solid #e7e8ef;
+  border-radius: 8px;
+  color: #62667a;
+  background: #fff;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.theme-toggle:hover {
+  background: #fafaff;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  color: #e7e8f1;
+  background: #11131b;
+  --ink: #e7e8f1;
+  --muted: #a1a5b7;
+  --line: #303443;
+}
+
+:root[data-theme="dark"] body {
+  color: #e7e8f1;
+  background: #11131b;
+}
+
+:root[data-theme="dark"] .sidebar,
+:root[data-theme="dark"] .topbar,
+:root[data-theme="dark"] .stat-card,
+:root[data-theme="dark"] .panel,
+:root[data-theme="dark"] .quick-actions,
+:root[data-theme="dark"] .auth-card {
+  border-color: #303443;
+  background: #1b1e29;
+  color: #e7e8f1;
+}
+
+:root[data-theme="dark"] dialog.discount-dialog {
+  border-color: #303443;
+  color: #e7e8f1;
+  background: #1b1e29;
+}
+
+:root[data-theme="dark"] .discount-dialog-fields {
+  border-color: #303443;
+  background: #242835;
+}
+
+:root[data-theme="dark"] .discount-dialog-heading p {
+  color: #a1a5b7;
+}
+
+:root[data-theme="dark"] .discount-dialog-close:hover {
+  color: #e7e8f1;
+  background: #303443;
+}
+
+:root[data-theme="dark"] .discount-dialog-footer {
+  border-color: #303443;
+}
+
+:root[data-theme="dark"] .discount-validation {
+  color: #f08a91 !important;
+}
+
+:root[data-theme="dark"] .quick-action {
+  border-color: #303443;
+}
+
+:root[data-theme="dark"] .quick-action:hover {
+  border-color: #4b466f;
+  background: #242335;
+}
+
+:root[data-theme="dark"] .topbar,
+:root[data-theme="dark"] .profile,
+:root[data-theme="dark"] .form-section-title,
+:root[data-theme="dark"] .form-footer,
+:root[data-theme="dark"] .delete-product-form {
+  border-color: #303443;
+}
+
+:root[data-theme="dark"] .side-nav a {
+  color: #b2b5c5;
+}
+
+:root[data-theme="dark"] .side-nav a:hover,
+:root[data-theme="dark"] .side-nav a.active {
+  color: #b5adff;
+  background: #2a2840;
+}
+
+:root[data-theme="dark"] .profile-info strong,
+:root[data-theme="dark"] .form-section-title strong,
+:root[data-theme="dark"] .row-main strong,
+:root[data-theme="dark"] .stat-card > strong,
+:root[data-theme="dark"] .panel-heading h2,
+:root[data-theme="dark"] .quick-actions h2,
+:root[data-theme="dark"] .empty-state strong,
+:root[data-theme="dark"] .table-product strong,
+:root[data-theme="dark"] td > strong,
+:root[data-theme="dark"] .field label {
+  color: #e7e8f1;
+}
+
+:root[data-theme="dark"] .profile-info span,
+:root[data-theme="dark"] .page-heading p,
+:root[data-theme="dark"] .stat-top,
+:root[data-theme="dark"] .stat-card > small,
+:root[data-theme="dark"] .panel-heading p,
+:root[data-theme="dark"] .row-main span,
+:root[data-theme="dark"] .empty-state p,
+:root[data-theme="dark"] .sales-note,
+:root[data-theme="dark"] .sales-metrics span,
+:root[data-theme="dark"] .table-product small,
+:root[data-theme="dark"] .field > small {
+  color: #a1a5b7;
+}
+
+:root[data-theme="dark"] .theme-toggle,
+:root[data-theme="dark"] .button-secondary {
+  border-color: #3a3e4e;
+  color: #d0d2df;
+  background: #242835;
+}
+
+:root[data-theme="dark"] .button-danger {
+  border-color: #57363b;
+  color: #f08a91;
+  background: #352529;
+}
+
+:root[data-theme="dark"] .button-danger:hover {
+  background: #432c31;
+}
+
+:root[data-theme="dark"] .theme-toggle:hover,
+:root[data-theme="dark"] .button-secondary:hover {
+  background: #2d3140;
+}
+
+:root[data-theme="dark"] .sales-metrics > div {
+  background: #242835;
+}
+
+:root[data-theme="dark"] .sales-metrics .profit-metric {
+  background: #1d382f;
+}
+
+:root[data-theme="dark"] .sales-metrics .profit-metric strong {
+  color: #57c79c;
+}
+
+:root[data-theme="dark"] .sales-metrics .profit-loss {
+  background: #3b2727;
+}
+
+:root[data-theme="dark"] .sales-metrics .profit-loss strong {
+  color: #f08a78;
+}
+
+:root[data-theme="dark"] .finance-profit {
+  color: #57c79c;
+}
+
+:root[data-theme="dark"] .finance-loss {
+  color: #f08a78;
+}
+
+:root[data-theme="dark"] .pagination {
+  color: #a1a5b7;
+}
+
+:root[data-theme="dark"] .finance-note {
+  color: #a1a5b7;
+}
+
+:root[data-theme="dark"] .compact-row,
+:root[data-theme="dark"] td {
+  border-color: #303443;
+}
+
+:root[data-theme="dark"] th {
+  color: #a1a5b7;
+  background: #242835;
+}
+
+:root[data-theme="dark"] td {
+  color: #b8bbca;
+}
+
+:root[data-theme="dark"] .table-product strong,
+:root[data-theme="dark"] td > strong,
+:root[data-theme="dark"] .stock-number {
+  color: #e0e2ec;
+}
+
+:root[data-theme="dark"] .field input,
+:root[data-theme="dark"] .field select,
+:root[data-theme="dark"] .form-stack input,
+:root[data-theme="dark"] .search-form,
+:root[data-theme="dark"] .table-action,
+:root[data-theme="dark"] .choice-card {
+  border-color: #3a3e4e;
+  color: #e1e3ed;
+  background: #242835;
+}
+
+:root[data-theme="dark"] .table-action-danger:hover {
+  border-color: #694249;
+  color: #f08a91;
+  background: #352529;
+}
+
+:root[data-theme="dark"] .search-form input {
+  color: #e1e3ed;
+}
+
+:root[data-theme="dark"] .choice-card:has(input:checked) {
+  border-color: #756bd2;
+  background: #2a2840;
+}
+
+:root[data-theme="dark"] .form-hint {
+  border-color: #3a3e4e;
+  color: #c1c4d1;
+  background: #242835;
+}
+
+:root[data-theme="dark"] .button-secondary {
+  box-shadow: none;
+}
+
+:root[data-theme="dark"] .auth-page {
+  background: radial-gradient(ellipse at 50% 8%, #27243e 0, #11131b 48%, #11131b 100%);
+}
+
+:root[data-theme="dark"] .auth-footer {
+  color: #a1a5b7;
+}

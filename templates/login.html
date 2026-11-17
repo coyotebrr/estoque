@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Entrar{% endblock %}
+{% block auth_content %}
+  {# Formulário de autenticação e link para criação de conta. #}
+  <div class="auth-card">
+    <div class="auth-eyebrow"><span></span> SEU ESTOQUE, SOB CONTROLE</div>
+    <h1>Bem-vindo de volta</h1>
+    <p class="auth-subtitle">Entre para acompanhar seus produtos e movimentações.</p>
+    <form method="post" class="form-stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label for="email">E-mail</label>
+      <input id="email"
+             name="email"
+             type="email"
+             placeholder="voce@empresa.com"
+             autocomplete="email"
+             required
+             maxlength="254"
+             value="{{ request.form.get('email', '') }}">
+      <label for="password">Senha</label>
+      <input id="password"
+             name="password"
+             type="password"
+             placeholder="Sua senha"
+             autocomplete="current-password"
+             required>
+      <button class="button button-primary button-full"
+              type="submit">Entrar na minha conta <span>→</span></button>
+    </form>
+    <div class="auth-switch">Ainda não tem uma conta? <a href="{{ url_for('register') }}">Criar conta grátis</a></div>
+  </div>
+{% endblock %}

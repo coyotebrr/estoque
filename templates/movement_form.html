@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Nova entrada{% endblock %}
+{% block section %}Estoque / Nova entrada{% endblock %}
+{% block content %}
+  {# Cabeçalho da operação e retorno ao histórico de movimentações. #}
+  <div class="page-heading">
+    <div>
+      <div class="eyebrow">CONTROLE DE ESTOQUE</div>
+      <h1>Nova entrada</h1>
+      <p>Adicione produtos ao estoque e mantenha o saldo atualizado.</p>
+    </div>
+    <a class="button button-secondary" href="{{ url_for('movements') }}">← Ver movimentações</a>
+  </div>
+  {# Formulário de entrada ou orientação quando ainda não há produtos cadastrados. #}
+  <section class="panel form-panel movement-panel">
+    {% if products %}
+      <form method="post" class="form-grid">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="kind" value="IN">
+        <div class="form-section-title">
+          <span class="form-section-icon icon-blue">↓</span>
+          <div><strong>Detalhes da entrada</strong><small>O saldo é atualizado automaticamente ao salvar.</small></div>
+        </div>
+        <div class="field field-wide"><label for="product_id">Produto <span class="required">*</span></label><select id="product_id" name="product_id" required><option value="">Selecione um produto</option>{% for product in products %}<option value="{{ product.id }}"
+        {{ 'selected' if selected_product_id == product.id }}>{{ product.name }}{% if product.sku %} · {{ product.sku }}{% endif %} — {{ product.quantity }} {{ product.unit|upper }} disponíveis</option>{% endfor %}</select></div>
+        <div class="field field-wide">
+          <label for="quantity">Quantidade <span class="required">*</span></label><input id="quantity"
+       name="quantity"
+       type="number"
+       min="1"
+       step="1"
+       required
+       placeholder="Ex.: 10"
+       value="{{ request.form.get('quantity', '') }}"><small>Informe um número inteiro maior que zero.</small>
+        </div>
+        <div class="field field-wide">
+          <label for="note">Observação <span class="optional">(opcional)</span></label><input id="note"
+       name="note"
+       maxlength="240"
+       placeholder="Ex.: Compra do fornecedor, pedido #1024..."
+       value="{{ request.form.get('note', '') }}">
+        </div>
+        <div class="form-footer field-wide">
+          <a class="button button-secondary" href="{{ url_for('products') }}">Cancelar</a><button class="button button-primary" type="submit">Registrar entrada <span>→</span></button>
+        </div>
+      </form>
+    {% else %}
+      <div class="empty-state large-empty">
+        <span class="empty-icon">▦</span><strong>Cadastre um produto primeiro</strong>
+        <p>Você precisa ter pelo menos um produto para registrar uma entrada.</p>
+        <a class="button button-primary button-small"
+           href="{{ url_for('new_product') }}">＋ Cadastrar produto</a>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

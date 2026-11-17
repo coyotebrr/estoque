@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Vendas{% endblock %}
+{% block section %}Vendas{% endblock %}
+{% block content %}
+  {# Cabeçalho com acesso ao cadastro de uma nova venda. #}
+  <div class="page-heading">
+    <div>
+      <div class="eyebrow">REGISTRO DE VENDAS</div>
+      <h1>Vendas</h1>
+      <p>Consulte o histórico das vendas registradas.</p>
+    </div>
+    <a class="button button-movement" href="{{ url_for('new_sale') }}">＋ Nova venda</a>
+  </div>
+  {# Histórico de vendas com pagamento e ações, sem resumo financeiro. #}
+  <section class="panel table-panel">
+    <div class="panel-heading">
+      <div>
+        <h2>Histórico recente <span class="count-badge">{{ summary.sale_count }}</span></h2>
+        <p>Exibindo até 100 vendas mais recentes.</p>
+      </div>
+    </div>
+    {% if sales %}
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>PRODUTO</th>
+              <th>QUANTIDADE</th>
+              <th>PAGAMENTO</th>
+              <th>OBSERVAÇÃO</th>
+              <th>DATA E HORA</th>
+              <th>AÇÕES</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for sale in sales %}
+              <tr>
+                <td><strong>{{ sale.product_name }}</strong></td>
+                <td>{{ sale.quantity }} {{ sale.unit|upper }}</td>
+                <td>{{ sale.payment_method or '—' }}</td>
+                <td class="note-cell">{{ sale.note or '—' }}</td>
+                <td>{{ sale.created_at.strftime("%d/%m/%Y · %H:%M") }}</td>
+                <td>
+                  <div class="table-actions">
+                    <a class="table-action"
+                       href="{{ url_for('edit_movement', movement_id=sale.id) }}"
+                       title="Editar venda"
+                       aria-label="Editar venda">✎</a>
+                    <form action="{{ url_for('delete_movement', movement_id=sale.id) }}"
+                          method="post"
+                          onsubmit="return confirm('Excluir esta venda? O estoque e os totais financeiros serão atualizados.');">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="table-action table-action-danger"
+        type="submit"
+        title="Excluir venda"
+        aria-label="Excluir venda">×</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state large-empty">
+        <span class="empty-icon">$</span><strong>Nenhuma venda registrada</strong>
+        <p>As vendas registradas aparecerão neste histórico.</p>
+        <a class="button button-movement button-small"
+           href="{{ url_for('new_sale') }}">＋ Registrar venda</a>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% block title %}Nova venda{% endblock %}
+{% block section %}Vendas / Nova{% endblock %}
+{% block content %}
+  {# Cabeçalho explica que o preço é obtido do cadastro do produto. #}
+  <div class="page-heading">
+    <div>
+      <div class="eyebrow">REGISTRO DE VENDAS</div>
+      <h1>Nova venda</h1>
+      <p>Selecione o produto e a quantidade; o preço virá automaticamente do cadastro.</p>
+    </div>
+    <a class="button button-secondary" href="{{ url_for('sales') }}">← Ver vendas</a>
+  </div>
+  {# Formulário de venda com seleção de produto, quantidade e pagamento. #}
+  <section class="panel form-panel movement-panel">
+    {% if products %}
+      <form method="post" class="form-grid">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-section-title">
+          <span class="form-section-icon icon-green">R$</span>
+          <div><strong>Detalhes da venda</strong><small>O saldo será reduzido e o lucro calculado ao salvar.</small></div>
+        </div>
+        <div class="field field-wide"><label for="product_id">Produto <span class="required">*</span></label><select id="product_id" name="product_id" required><option value="">Selecione um produto</option>{% for product in products %}<option value="{{ product.id }}"
+        data-sale-price="{{ product.sale_price if product.sale_price is not none else '' }}"
+        {{ 'selected' if selected_product_id == product.id }}
+        {{ 'disabled' if product.sale_price is none }}>{{ product.name }}{% if product.sku %} · {{ product.sku }}{% endif %} — {{ product.quantity }} {{ product.unit|upper }} disponíveis{% if product.sale_price is none %} · cadastre o preço de venda{% else %} · {{ product.sale_price|brl }}{% endif %}</option>{% endfor %}</select><small>Produtos sem preço de venda cadastrado precisam ser atualizados em <a class="text-link" href="{{ url_for('products') }}">Estoque</a>.</small></div>
+        <div class="field field-wide">
+          <label for="quantity">Quantidade <span class="required">*</span></label><input id="quantity"
+       name="quantity"
+       type="number"
+       min="1"
+       step="1"
+       required
+       placeholder="Ex.: 2"
+       value="{{ request.form.get('quantity', '') }}"><small>A quantidade não pode superar o saldo disponível.</small>
+        </div>
+        <div class="field field-wide">
+          <label for="sale_unit_price">Preço de venda unitário</label>
+          <div class="input-prefix">
+            <span>R$</span><input id="sale_unit_price"
+       type="text"
+       readonly
+       placeholder="Selecione um produto">
+          </div>
+          <small>Preço definido no cadastro do produto.</small>
+        </div>
+        <div class="field field-wide">
+          {# Resumo do desconto aplicado à venda e total estimado. #}
+          <label>Desconto</label>
+          <div class="dashboard-actions">
+            <button class="button button-secondary"
+                    id="open-discount"
+                    type="button">＋ Adicionar desconto</button>
+            <span id="discount-summary">Sem desconto</span>
+          </div>
+          <small id="sale-total-preview">Total da venda: R$ 0,00</small>
+        </div>
+        {# Janela para escolher desconto percentual ou em valor fixo. #}
+        <dialog class="discount-dialog"
+                id="discount-dialog"
+                aria-labelledby="discount-title">
+          <div class="discount-dialog-content">
+            <div class="discount-dialog-heading">
+              <span class="discount-dialog-icon">−</span>
+              <div>
+                <h2 id="discount-title">Adicionar desconto</h2>
+                <p>Escolha o tipo e informe o valor que deseja aplicar nesta venda.</p>
+              </div>
+              <button class="discount-dialog-close"
+                      id="close-discount"
+                      type="button"
+                      aria-label="Fechar">×</button>
+            </div>
+            <div class="discount-dialog-fields">
+              <div class="field">
+                <label for="discount_type">Tipo de desconto</label>
+                <select id="discount_type" name="discount_type">
+                  <option value="PERCENT"
+                          {{ 'selected' if request.form.get("discount_type") == 'PERCENT' }}>Porcentagem</option>
+                  <option value="AMOUNT"
+                          {{ 'selected' if request.form.get('discount_type', 'AMOUNT') == 'AMOUNT' }}>Valor fixo</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="discount_value">Valor do desconto</label>
+                <div class="input-prefix">
+                  <span id="discount-prefix">%</span><input id="discount_value"
+       name="discount_value"
+       type="number"
+       min="0"
+       max="100"
+       step="0.01"
+       required
+       value="{{ request.form.get('discount_value', '0') }}">
+                </div>
+              </div>
+              <small class="discount-validation" id="discount-error" aria-live="polite"></small>
+            </div>
+            <div class="discount-dialog-footer">
+              <button class="button button-secondary"
+                      id="cancel-discount"
+                      type="button">Cancelar</button>
+              <button class="button button-movement"
+                      id="apply-discount"
+                      type="button">Aplicar desconto</button>
+            </div>
+          </div>
+        </dialog>
+        <div class="field field-wide"><label for="payment_method">Método de pagamento <span class="required">*</span></label><select id="payment_method" name="payment_method" required><option value="">Selecione um método de pagamento</option>{% for method in payment_methods %}<option value="{{ method }}"
+        {{ 'selected' if request.form.get("payment_method") == method }}>{{ method }}</option>{% endfor %}</select></div>
+        <div class="field field-wide">
+          <label for="note">Observação <span class="optional">(opcional)</span></label><input id="note"
+       name="note"
+       maxlength="240"
+       placeholder="Ex.: Pedido #1024..."
+       value="{{ request.form.get('note', '') }}">
+        </div>
+        <div class="form-footer field-wide">
+          <a class="button button-secondary" href="{{ url_for('sales') }}">Cancelar</a><button class="button button-movement" type="submit">Registrar venda <span>→</span></button>
+        </div>
+      </form>
+    {% else %}
+      <div class="empty-state large-empty">
+        <span class="empty-icon">▦</span><strong>Cadastre um produto primeiro</strong>
+        <p>É necessário ter produtos cadastrados para registrar uma venda.</p>
+        <a class="button button-primary button-small"
+           href="{{ url_for('new_product') }}">＋ Cadastrar produto</a>
+      </div>
+    {% endif %}
+  </section>
+  {% if products %}
+    {# Sincroniza o preço, calcula o resumo do desconto e controla a janela modal. #}
+    <script>
+      const discountDialog = document.getElementById("discount-dialog");
+      const discountType = document.getElementById("discount_type");
+      const discountValue = document.getElementById("discount_value");
+      const productSelect = document.getElementById("product_id");
+      const quantityInput = document.getElementById("quantity");
+      const salePriceInput = document.getElementById("sale_unit_price");
+      const discountSummary = document.getElementById("discount-summary");
+      const saleTotalPreview = document.getElementById("sale-total-preview");
+      const discountError = document.getElementById("discount-error");
+      const discountPrefix = document.getElementById("discount-prefix");
+      const currency = new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+      });
+      let appliedDiscountType = discountType.value;
+      let appliedDiscountValue = discountValue.value;
+
+      const updateProductPrice = () => {
+        const selectedOption = productSelect.selectedOptions[0];
+        const salePrice = selectedOption ? selectedOption.dataset.salePrice : "";
+        salePriceInput.value = salePrice ? currency.format(Number(salePrice)) : "";
+        updateDiscount();
+      };
+      const updateDiscount = () => {
+        const selectedOption = productSelect.selectedOptions[0];
+        const unitPrice = selectedOption ? Number(selectedOption.dataset.salePrice) || 0 : 0;
+        const grossTotal = (Number(quantityInput.value) || 0) * unitPrice;
+        discountValue.max = discountType.value === "PERCENT" ? "100" : "9999999999.99";
+        const value = Number(discountValue.value) || 0;
+        const discount = discountType.value === "PERCENT" ? Math.round(grossTotal * value) / 100 : value;
+        const total = Math.max(grossTotal - discount, 0);
+        discountError.textContent = discountType.value === "AMOUNT" && discount > grossTotal ?
+          "O desconto não pode ser maior que o valor total da venda." :
+          "";
+        discountSummary.textContent = value > 0 ?
+          `Desconto: ${currency.format(discount)}${discountType.value === "PERCENT" ? ` (${value}%)` : ""}` :
+          "Sem desconto";
+        saleTotalPreview.textContent = `Total da venda: ${currency.format(total)}`;
+      };
+
+      const restoreDiscount = () => {
+        discountType.value = appliedDiscountType;
+        discountValue.value = appliedDiscountValue;
+        updateDiscount();
+      };
+      const openDiscountButton = document.getElementById("open-discount");
+      const closeDiscountDialog = () => {
+        restoreDiscount();
+        discountDialog.close();
+        openDiscountButton.focus();
+      };
+      openDiscountButton.addEventListener("click", () => {
+        discountDialog.showModal();
+        discountType.focus();
+      });
+      document.getElementById("cancel-discount").addEventListener("click", closeDiscountDialog);
+      document.getElementById("close-discount").addEventListener("click", closeDiscountDialog);
+      discountDialog.addEventListener("cancel", restoreDiscount);
+      discountDialog.addEventListener("click", (event) => {
+        if (event.target === discountDialog) {
+          closeDiscountDialog();
+        }
+      });
+      discountDialog.addEventListener("close", () => openDiscountButton.focus());
+      document.getElementById("apply-discount").addEventListener("click", () => {
+        const selectedOption = productSelect.selectedOptions[0];
+        const grossTotal = (Number(quantityInput.value) || 0) * (selectedOption ? Number(selectedOption.dataset.salePrice) || 0 : 0);
+        const value = Number(discountValue.value) || 0;
+        const exceedsTotal = discountType.value === "AMOUNT" && value > grossTotal;
+        if (!exceedsTotal && discountValue.reportValidity()) {
+          appliedDiscountType = discountType.value;
+          appliedDiscountValue = discountValue.value;
+          discountDialog.close();
+          openDiscountButton.focus();
+          updateDiscount();
+        }
+      });
+      discountType.addEventListener("change", () => {
+        discountValue.max = discountType.value === "PERCENT" ? "100" : "9999999999.99";
+        discountPrefix.textContent = discountType.value === "PERCENT" ? "%" : "R$";
+        updateDiscount();
+      });
+      [discountValue, quantityInput].forEach((input) => {
+        input.addEventListener("input", updateDiscount);
+      });
+      productSelect.addEventListener("change", updateProductPrice);
+      discountType.dispatchEvent(new Event("change"));
+      updateProductPrice();
+    </script>
+  {% endif %}
+{% endblock %}

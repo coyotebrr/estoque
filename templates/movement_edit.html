@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar venda' if movement.kind == 'OUT' else 'Editar entrada' }}{% endblock %}
+{% block section %}{{ 'Vendas' if movement.kind == 'OUT' else 'Estoque / Entradas' }} / Editar{% endblock %}
+{% block content %}
+  {# Cabeçalho varia entre edição de venda e edição de entrada. #}
+  <div class="page-heading">
+    <div>
+      <div class="eyebrow">{{ 'HISTÓRICO DE VENDAS' if movement.kind == 'OUT' else 'HISTÓRICO DO ESTOQUE' }}</div>
+      <h1>{{ 'Editar venda' if movement.kind == 'OUT' else 'Editar entrada' }}</h1>
+      <p>Altere os dados; o saldo e os valores financeiros serão atualizados.</p>
+    </div>
+    <a class="button button-secondary"
+       href="{{ url_for('sales' if movement.kind == 'OUT' else 'movements') }}">← Voltar</a>
+  </div>
+  {# Campos da movimentação; dados financeiros e pagamento aparecem para vendas. #}
+  <section class="panel form-panel movement-panel">
+    <form method="post" class="form-grid">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-section-title"><span class="form-section-icon icon-blue">{{ 'R$' if movement.kind == 'OUT' else '↓' }}</span><div><strong>Detalhes da {{ 'venda' if movement.kind == 'OUT' else 'entrada' }}</strong><small>Produto: {{ movement.product_name_snapshot }}{% if movement.product_id is none %} (removido do catálogo){% endif %}</small></div></div>
+      {% if has_active_product %}
+        <div class="field field-wide">
+          <label>Tipo de registro</label>
+          <strong>{{ 'Venda' if movement.kind == 'OUT' else 'Entrada' }}</strong>
+        </div>
+        <div class="field field-wide">
+          <label for="quantity">Quantidade <span class="required">*</span></label><input id="quantity"
+       name="quantity"
+       type="number"
+       min="1"
+       step="1"
+       required
+       value="{{ request.form.get('quantity', movement.quantity) }}"><small>O saldo será ajustado automaticamente.</small>
+        </div>
+      {% else %}
+        <div class="form-hint field-wide"><span>ⓘ</span> O produto foi removido do catálogo. O tipo e a quantidade ficam preservados; você ainda pode corrigir os valores registrados.</div>
+      {% endif %}
+      <div class="field field-wide"
+           id="cost-price-field"
+           {{ 'hidden' if request.form.get('kind', movement.kind) != 'OUT' }}>
+        <label for="cost_unit_price">Custo por unidade (R$) <span class="required">*</span></label>
+        <div class="input-prefix">
+          <span>R$</span><input id="cost_unit_price"
+       name="cost_unit_price"
+       type="number"
+       min="0"
+       step="0.01"
+       value="{{ request.form.get('cost_unit_price', movement.cost_unit_price if movement.cost_unit_price is not none else '') }}"
+       {{ 'disabled' if request.form.get('kind', movement.kind) != 'OUT' }}>
+        </div>
+      </div>
+      <div class="field field-wide"
+           id="sale-price-field"
+           {{ 'hidden' if request.form.get('kind', movement.kind) != 'OUT' }}>
+        <label for="sale_unit_price">Preço de venda unitário</label>
+        <div class="input-prefix">
+          <span>R$</span><input id="sale_unit_price"
+       type="number"
+       value="{{ movement.sale_unit_price if movement.sale_unit_price is not none else '' }}"
+       readonly
+       {{ 'disabled' if request.form.get('kind', movement.kind) != 'OUT' }}>
+        </div>
+        <small>O preço histórico da venda é preservado; atualize o preço no cadastro do produto para novas vendas.</small>
+      </div>
+      <div class="field field-wide"
+           id="discount-field"
+           {{ 'hidden' if request.form.get('kind', movement.kind) != 'OUT' }}>
+        <label>Desconto</label>
+        <div class="discount-edit-fields">
+          <div class="field">
+            <label for="discount_type">Tipo de desconto</label>
+            <select id="discount_type"
+                    name="discount_type"
+                    {{ 'disabled' if request.form.get('kind', movement.kind) != 'OUT' }}>
+              <option value="PERCENT"
+                      {{ 'selected' if request.form.get('discount_type', movement.discount_type) == 'PERCENT' }}>Porcentagem (%)</option>
+              <option value="AMOUNT"
+                      {{ 'selected' if request.form.get('discount_type', movement.discount_type) == 'AMOUNT' }}>Valor bruto (R$)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="discount_value">Valor do desconto</label>
+            <input id="discount_value"
+                   name="discount_value"
+                   type="number"
+                   min="0"
+                   max="9999999999.99"
+                   step="0.01"
+                   required
+                   value="{{ request.form.get('discount_value', movement.discount_value) }}"
+                   {{ 'disabled' if request.form.get('kind', movement.kind) != 'OUT' }}>
+          </div>
+        </div>
+        <small id="discount-summary"></small>
+        <small class="discount-validation" id="discount-error" aria-live="polite"></small>
+        <small>O desconto será recalculado e aplicado aos valores financeiros ao salvar.</small>
+      </div>
+      <div class="field field-wide"
+           id="payment-method-field"
+           {{ 'hidden' if request.form.get('kind', movement.kind) != 'OUT' }}>
+        <label for="payment_method">Método de pagamento <span class="required">*</span></label>
+        <select id="payment_method"
+                name="payment_method"
+                {{ 'disabled' if request.form.get('kind', movement.kind) != 'OUT' }}>
+          <option value="">Selecione um método de pagamento</option>
+          {% for method in payment_methods %}
+            <option value="{{ method }}"
+                    {{ 'selected' if request.form.get('payment_method', movement.payment_method or '') == method }}>{{ method }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="field field-wide">
+        <label for="note">Observação <span class="optional">(opcional)</span></label><input id="note"
+       name="note"
+       maxlength="240"
+       value="{{ request.form.get('note', movement.note) }}">
+      </div>
+      <div class="form-footer field-wide">
+        <a class="button button-secondary"
+           href="{{ url_for('sales' if movement.kind == 'OUT' else 'movements') }}">Cancelar</a><button class="button button-primary" type="submit">Salvar alterações <span>→</span></button>
+      </div>
+    </form>
+  </section>
+  {# Atualiza o resumo do desconto e controla campos financeiros da venda. #}
+  <script>
+    const costPriceField = document.getElementById("cost-price-field");
+    const costPriceInput = document.getElementById("cost_unit_price");
+    const salePriceField = document.getElementById("sale-price-field");
+    const salePriceInput = document.getElementById("sale_unit_price");
+    const paymentMethodField = document.getElementById("payment-method-field");
+    const paymentMethodInput = document.getElementById("payment_method");
+    const discountField = document.getElementById("discount-field");
+    const discountType = document.getElementById("discount_type");
+    const discountValue = document.getElementById("discount_value");
+    const quantityInput = document.getElementById("quantity");
+    const currency = new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
+    const discountSummary = document.getElementById("discount-summary");
+    const discountError = document.getElementById("discount-error");
+    let grossTotal = 0;
+    const updateDiscountSummary = () => {
+      const quantity = quantityInput ? Number(quantityInput.value) : {{ movement.quantity }};
+      grossTotal = (quantity || 0) * (Number(salePriceInput.value) || 0);
+      discountValue.max = discountType.value === "PERCENT" ? "100" : "9999999999.99";
+      const value = Number(discountValue.value) || 0;
+      const discount = discountType.value === "PERCENT" ? Math.round(grossTotal * value) / 100 : value;
+      discountError.textContent = discountType.value === "AMOUNT" && discount > grossTotal ?
+        "O desconto não pode ser maior que o valor total da venda." :
+        "";
+      discountSummary.textContent = value > 0 ?
+        `${currency.format(discount)}${discountType.value === "PERCENT" ? ` (${value}%)` : ""}` :
+        "Sem desconto";
+    };
+    discountType.addEventListener("change", () => {
+      discountValue.max = discountType.value === "PERCENT" ? "100" : "9999999999.99";
+      updateDiscountSummary();
+    });
+    [discountValue, quantityInput, salePriceInput].filter(Boolean).forEach((input) => {
+      input.addEventListener("input", updateDiscountSummary);
+    });
+    const updateSaleFields = (kind) => {
+      const isSale = kind === "OUT";
+      costPriceField.hidden = !isSale;
+      costPriceInput.disabled = !isSale;
+      costPriceInput.required = isSale;
+      salePriceField.hidden = !isSale;
+      salePriceInput.disabled = !isSale;
+      salePriceInput.required = isSale;
+      paymentMethodField.hidden = !isSale;
+      paymentMethodInput.disabled = !isSale;
+      paymentMethodInput.required = isSale;
+      discountField.hidden = !isSale;
+      discountType.disabled = !isSale;
+      discountValue.disabled = !isSale;
+    };
+    updateSaleFields({{ '\"OUT\"' if movement.kind == 'OUT' else '\"IN\"' }});
+    discountType.dispatchEvent(new Event("change"));
+  </script>
+{% endblock %}

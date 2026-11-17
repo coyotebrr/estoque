@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar produto' if product else 'Novo produto' }}{% endblock %}
+{% block section %}Produtos / {{ 'Editar produto' if product else 'Novo produto' }}{% endblock %}
+{% block content %}
+  {# Cabeçalho contextualiza se o formulário cadastra ou edita um produto. #}
+  <div class="page-heading">
+    <div>
+      <div class="eyebrow">CATÁLOGO DE PRODUTOS</div>
+      <h1>{{ 'Editar produto' if product else 'Cadastrar produto' }}</h1>
+      <p>Preencha as informações para organizar seu catálogo.</p>
+    </div>
+    <a class="button button-secondary" href="{{ url_for('products') }}">← Voltar para produtos</a>
+  </div>
+  {# Dados de identificação, estoque mínimo e preços do produto. #}
+  <section class="panel form-panel">
+    <form method="post" class="form-grid">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-section-title">
+        <span class="form-section-icon">▦</span>
+        <div><strong>Informações do produto</strong><small>Dados básicos para identificar seu item.</small></div>
+      </div>
+      <div class="field field-wide">
+        <label for="name">Nome do produto <span class="required">*</span></label><input id="name"
+       name="name"
+       required
+       maxlength="160"
+       placeholder="Ex.: Café em grãos 500g"
+       value="{{ request.form.get('name', product.name if product else '') }}">
+      </div>
+      <div class="field">
+        <label for="sku">Código / SKU</label><input id="sku"
+       name="sku"
+       maxlength="80"
+       placeholder="Ex.: CAFE-001"
+       value="{{ request.form.get('sku', product.sku if product else '') }}"><small>Código único opcional para facilitar a busca.</small>
+      </div>
+      <div class="field">
+        <label for="category">Categoria</label><input id="category"
+       name="category"
+       maxlength="100"
+       placeholder="Ex.: Alimentos"
+       value="{{ request.form.get('category', product.category if product else '') }}">
+      </div>
+      <div class="field">
+        <label for="unit">Unidade de medida</label><input id="unit"
+       name="unit"
+       maxlength="30"
+       class="unit-field"
+       placeholder="Ex.: UN, KG, CX"
+       value="{{ request.form.get('unit', product.unit if product else 'UN')|upper }}"><small>Será salva sempre em letras maiúsculas.</small>
+      </div>
+      <div class="field">
+        <label for="min_stock">Estoque mínimo</label><input id="min_stock"
+       name="min_stock"
+       type="number"
+       min="0"
+       step="1"
+       value="{{ request.form.get('min_stock', product.min_stock if product else '0') }}"><small>Você será avisado quando chegar neste limite.</small>
+      </div>
+      <div class="field">
+        <label for="cost_price">Custo de aquisição unitário (R$)</label>
+        <div class="input-prefix">
+          <span>R$</span><input id="cost_price"
+       name="cost_price"
+       type="number"
+       min="0"
+       max="9999999999.99"
+       step="0.01"
+       required
+       value="{{ request.form.get('cost_price', product.cost_price if product else '') }}">
+        </div>
+        <small>Usado como investimento para calcular o lucro das saídas.</small>
+      </div>
+      <div class="field">
+        <label for="sale_price">Preço de venda unitário (R$) <span class="required">*</span></label>
+        <div class="input-prefix">
+          <span>R$</span><input id="sale_price"
+       name="sale_price"
+       type="number"
+       min="0"
+       max="9999999999.99"
+       step="0.01"
+       required
+       value="{{ request.form.get('sale_price', product.sale_price if product and product.sale_price is not none else '') }}">
+        </div>
+        <small>Este valor será usado automaticamente ao registrar uma venda.</small>
+      </div>
+      {% if not product %}<div class="form-hint field-wide"><span>ⓘ</span> A quantidade inicial começa em zero. Registre uma entrada após salvar para adicionar produtos ao estoque.</div>{% endif %}
+      <div class="form-footer field-wide">
+        <a class="button button-secondary" href="{{ url_for('products') }}">Cancelar</a>
+        <button class="button button-primary" type="submit">Salvar produto <span>→</span></button>
+      </div>
+    </form>
+    {% if product %}
+      {# Exclusão fica separada do formulário de edição para evitar envio acidental. #}
+      <form action="{{ url_for('delete_product', product_id=product.id) }}"
+            method="post"
+            class="delete-product-form"
+            onsubmit="return confirm('Tem certeza que deseja excluir este produto? Esta ação não pode ser desfeita.');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="button button-danger" type="submit">Excluir produto</button>
+      </form>
+    {% endif %}
+  </section>
+{% endblock %}

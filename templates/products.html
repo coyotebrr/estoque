@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Estoque{% endblock %}
+{% block section %}Estoque{% endblock %}
+{% block content %}
+  {# Título da área de estoque e atalho para cadastro. #}
+  <div class="page-heading">
+    <div>
+      <div class="eyebrow">CONTROLE DE ESTOQUE</div>
+      <h1>Estoque</h1>
+      <p>Gerencie produtos, consulte saldos e acompanhe as quantidades disponíveis.</p>
+    </div>
+    <a class="button button-primary" href="{{ url_for('new_product') }}">＋ Cadastrar produto</a>
+  </div>
+  {# Busca e tabela com saldo, preços e ações disponíveis para cada produto. #}
+  <section class="panel table-panel">
+    <div class="panel-heading table-toolbar">
+      <div>
+        <h2>Todos os produtos <span class="count-badge">{{ products|length }}</span></h2>
+        <p>Os produtos são visíveis somente na sua conta.</p>
+      </div>
+      <form class="search-form" method="get">
+        <span>⌕</span><input type="search"
+       name="q"
+       value="{{ search }}"
+       placeholder="Buscar produto..."
+       aria-label="Buscar produto"><button type="submit">Buscar</button>
+      </form>
+    </div>
+    {% if products %}
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>PRODUTO</th>
+              <th>CATEGORIA</th>
+              <th>EM ESTOQUE</th>
+              <th>ESTOQUE MÍN.</th>
+              <th>CUSTO UNITÁRIO</th>
+              <th>VENDA UNITÁRIA</th>
+              <th>AÇÕES</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in products %}
+              <tr>
+                <td>
+                  <div class="table-product"><span class="product-symbol">{{ product.name[:1]|upper }}</span><span><strong>{{ product.name }}</strong><small>{{ product.sku if product.sku else 'Sem código' }}</small></span></div>
+                </td>
+                <td>{{ product.category or '—' }}</td>
+                <td><span class="stock-number {{ 'stock-low' if product.quantity <= product.min_stock else '' }}">{{ product.quantity }} {{ product.unit|upper }}</span></td>
+                <td>{{ product.min_stock }} {{ product.unit|upper }}</td>
+                <td>{{ product.cost_price|brl }}</td>
+                <td>{{ product.sale_price|brl if product.sale_price is not none else 'Cadastre o preço' }}</td>
+                <td>
+                  <div class="table-actions"><a class="table-action"
+   href="{{ url_for('new_movement', product_id=product.id) }}"
+   title="Registrar entrada"
+   aria-label="Registrar entrada">↓</a><a class="table-action"
+   href="{{ url_for('edit_product', product_id=product.id) }}"
+   title="Editar produto">✎</a></div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state large-empty"><span class="empty-icon">▦</span><strong>{{ 'Nenhum produto encontrado' if search else 'Seu catálogo está vazio' }}</strong><p>{{ 'Tente outra busca ou limpe o filtro.' if search else 'Cadastre seu primeiro produto para começar a controlar o estoque.' }}</p>{% if not search %}<a class="button button-primary button-small"
+   href="{{ url_for('new_product') }}">＋ Cadastrar produto</a>{% endif %}</div>
+    {% endif %}
+  </section>
+{% endblock %}

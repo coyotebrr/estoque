@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}Financeiro{% endblock %}
+{% block section %}Financeiro{% endblock %}
+{% block content %}
+  {# Cabeçalho e indicadores financeiros acumulados. #}
+  <div class="page-heading">
+    <div>
+      <div class="eyebrow">CONTROLE FINANCEIRO</div>
+      <h1>Financeiro</h1>
+      <p>Acompanhe faturamento bruto e líquido, descontos, custos, métodos de pagamento e lucro.</p>
+    </div>
+    <a class="button button-movement" href="{{ url_for('new_sale') }}">＋ Nova venda</a>
+  </div>
+  {# Totais gerais de custos, bruto, descontos, líquido e lucro. #}
+  <div class="finance-summary">
+    <article class="stat-card">
+      <div class="stat-top"><span>Investimento nas vendas</span><span class="stat-icon icon-orange">R$</span></div>
+      <strong class="stat-money">{{ summary.invested_value|brl }}</strong><small>custo dos produtos vendidos</small></article>
+    <article class="stat-card">
+      <div class="stat-top"><span>Faturamento bruto</span><span class="stat-icon icon-blue">R$</span></div>
+      <strong class="stat-money">{{ summary.gross_sales_value|brl }}</strong><small>antes dos descontos</small></article>
+    <article class="stat-card">
+      <div class="stat-top"><span>Descontos concedidos</span><span class="stat-icon icon-orange">−</span></div>
+      <strong class="stat-money">{{ summary.discount_value|brl }}</strong><small>total abatido das vendas</small></article>
+    <article class="stat-card">
+      <div class="stat-top"><span>Faturamento líquido</span><span class="stat-icon icon-blue">R$</span></div>
+      <strong class="stat-money">{{ summary.sales_value|brl }}</strong><small>bruto menos descontos</small></article>
+    <article class="stat-card">
+      <div class="stat-top"><span>Lucro total</span><span class="stat-icon icon-green">R$</span></div>
+      <strong class="stat-money {{ 'finance-loss' if summary.profit < 0 else 'finance-profit' }}">{{ summary.profit|brl }}</strong><small>faturamento líquido menos custos</small></article>
+  </div>
+  {# Consolidação das vendas separada por método de pagamento. #}
+  <section class="panel table-panel">
+    <div class="panel-heading">
+      <div>
+        <h2>Resumo por método de pagamento</h2>
+        <p>Quantidade, custos, faturamento bruto e líquido, descontos e lucro em cada forma de pagamento.</p>
+      </div>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>MÉTODO</th>
+            <th>VENDAS</th>
+            <th>CUSTO</th>
+            <th>BRUTO</th>
+            <th>DESCONTOS</th>
+            <th>LÍQUIDO</th>
+            <th>LUCRO</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for payment in payment_summary %}
+            <tr>
+              <td><strong>{{ payment.method }}</strong></td>
+              <td>{{ payment.sale_count }}</td>
+              <td>{{ payment.invested_value|brl }}</td>
+              <td>{{ payment.gross_sales_value|brl }}</td>
+              <td>{{ payment.discount_value|brl }}</td>
+              <td>{{ payment.sales_value|brl }}</td>
+              <td>{{ payment.profit|brl }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  {# Histórico detalhado, paginação e aviso sobre registros sem preço. #}
+  <section class="panel table-panel">
+    <div class="panel-heading">
+      <div>
+        <h2>Detalhes das vendas <span class="count-badge">{{ total_count }}</span></h2>
+        <p>Valores, descontos e método de pagamento por venda, incluindo itens já removidos do catálogo.</p>
+      </div>
+    </div>
+    {% if movements %}
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>PRODUTO</th>
+              <th>QUANTIDADE</th>
+              <th>MÉTODO</th>
+              <th>CUSTO UNIT.</th>
+              <th>INVESTIMENTO</th>
+              <th>VENDA UNIT.</th>
+              <th>BRUTO</th>
+              <th>DESCONTO</th>
+              <th>LÍQUIDO</th>
+              <th>LUCRO</th>
+              <th>DATA</th>
+              <th>OBSERVAÇÃO</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for movement in movements %}
+              <tr>
+                <td><strong>{{ movement.product_name }}</strong></td>
+                <td>{{ movement.quantity }} {{ movement.unit|upper }}</td>
+                <td>{{ movement.payment_method or 'Não informado' }}</td>
+                <td>{{ movement.cost_unit_price|brl if movement.cost_unit_price is not none else '—' }}</td>
+                <td>{{ (movement.cost_unit_price * movement.quantity)|brl if movement.cost_unit_price is not none else '—' }}</td>
+                <td>{{ movement.sale_unit_price|brl if movement.sale_unit_price is not none else '—' }}</td>
+                <td>{{ movement.gross_sales_value|brl if movement.gross_sales_value is not none else '—' }}</td>
+                <td>{{ movement.discount_amount|brl }}{% if movement.discount_value %}<small>{{ movement.discount_value }}{{ '%' if movement.discount_type == 'PERCENT' else ' fixo' }}</small>{% endif %}</td>
+                <td>{{ movement.sales_value|brl if movement.sales_value is not none else '—' }}</td>
+                <td>{{ movement.profit|brl if movement.profit is not none else '—' }}</td>
+                <td>{{ movement.created_at.strftime("%d/%m/%Y · %H:%M") }}</td>
+                <td class="note-cell">{{ movement.note or '—' }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% if total_pages > 1 %}
+        <nav class="pagination" aria-label="Paginação das vendas">
+          {% if page > 1 %}<a class="button button-secondary button-small"
+   href="{{ url_for('finance', page=page - 1) }}">← Anterior</a>{% endif %}
+          <span>Página {{ page }} de {{ total_pages }}</span>
+          {% if page < total_pages %}<a class="button button-secondary button-small"
+   href="{{ url_for('finance', page=page + 1) }}">Próxima →</a>{% endif %}
+        </nav>
+      {% endif %}
+    {% else %}
+      <div class="empty-state large-empty">
+        <span class="empty-icon">R$</span><strong>Nenhuma venda registrada</strong>
+        <p>As vendas com valores financeiros aparecerão aqui depois que forem registradas.</p>
+        <a class="button button-movement button-small"
+           href="{{ url_for('new_sale') }}">＋ Nova venda</a>
+      </div>
+    {% endif %}
+    {% if summary.unpriced_out_count %}
+      <p class="finance-note">{{ summary.unpriced_out_count }} saída(s) antiga(s) sem custo e/ou preço de venda não entram nos totais financeiros.</p>
+    {% endif %}
+  </section>
+{% endblock %}

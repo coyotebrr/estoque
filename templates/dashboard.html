@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Visão geral{% endblock %}
+{% block section %}Visão geral{% endblock %}
+{% block content %}
+  {# Título do painel e atalhos para as operações mais comuns. #}
+  <div class="page-heading">
+    <div>
+      <div class="eyebrow">RESUMO DO ESTOQUE</div>
+      <h1>Olá, {{ current_user.name.split()[0] }} <span class="wave">✳</span></h1>
+      <p>Aqui está o resumo do seu estoque hoje.</p>
+    </div>
+    <div class="dashboard-actions">
+      <a class="button button-primary" href="{{ url_for('new_product') }}">＋ Cadastrar produto</a>
+      <a class="button button-movement" href="{{ url_for('new_sale') }}">＋ Nova venda</a>
+    </div>
+  </div>
+  {# Indicadores resumidos da quantidade e do valor em estoque. #}
+  <div class="stats-grid">
+    <article class="stat-card">
+      <div class="stat-top"><span>Produtos cadastrados</span><span class="stat-icon icon-violet">▦</span></div>
+      <strong>{{ summary.product_count }}</strong><small>produtos diferentes</small></article>
+    <article class="stat-card">
+      <div class="stat-top"><span>Unidades em estoque</span><span class="stat-icon icon-blue">▤</span></div>
+      <strong>{{ summary.unit_count }}</strong><small>unidades disponíveis</small></article>
+    <article class="stat-card">
+      <div class="stat-top"><span>Estoque baixo</span><span class="stat-icon icon-orange">⌁</span></div>
+      <strong>{{ summary.low_stock_count }}</strong><small>produtos para conferir</small></article>
+    <article class="stat-card">
+      <div class="stat-top"><span>Investimento em estoque</span><span class="stat-icon icon-green">R$</span></div>
+      <strong class="stat-money">{{ summary.stock_value|brl }}</strong><small>custo dos produtos disponíveis</small></article>
+  </div>
+  {# Resultado financeiro consolidado das vendas registradas. #}
+  <section class="panel sales-summary">
+    <div class="panel-heading">
+      <div>
+        <h2>Resultado das vendas</h2>
+        <p>Faturamento, custo e lucro das vendas registradas</p>
+      </div>
+      <a class="text-link" href="{{ url_for('sales') }}">Ver vendas →</a>
+    </div>
+    <div class="sales-metrics">
+      <div><span>Investimento nas vendas</span><strong>{{ sales_summary.invested_value|brl }}</strong></div>
+      <div><span>Valor das vendas</span><strong>{{ sales_summary.sales_value|brl }}</strong></div>
+      <div class="profit-metric {{ 'profit-loss' if sales_summary.profit < 0 else '' }}"><span>Lucro total</span><strong>{{ sales_summary.profit|brl }}</strong></div>
+    </div>
+    {% if sales_summary.unpriced_out_count %}
+      <p class="sales-note">{{ sales_summary.unpriced_out_count }} saída(s) anterior(es) sem preço de venda não entram neste cálculo.</p>
+    {% else %}
+      <p class="sales-note">O lucro considera o custo unitário, o preço de venda e os descontos informados em cada saída.</p>
+    {% endif %}
+  </section>
+  {# Listas de estoque baixo e atividades recentes. #}
+  <div class="dashboard-grid">
+    <section class="panel">
+      <div class="panel-heading">
+        <div>
+          <h2>Estoque baixo</h2>
+          <p>Produtos no limite ou abaixo do mínimo</p>
+        </div>
+        <a class="text-link" href="{{ url_for('products') }}">Ver produtos →</a>
+      </div>
+      {% if low_stock %}
+        <div class="compact-list">
+          {% for product in low_stock %}
+            <div class="compact-row">
+              <span class="product-symbol">{{ product.name[:1]|upper }}</span>
+              <div class="row-main"><strong>{{ product.name }}</strong><span>{{ product.quantity }} {{ product.unit|upper }} disponíveis</span></div>
+              <span class="status-pill status-warning">Mín. {{ product.min_stock }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <span class="empty-icon">✓</span><strong>Tudo em ordem!</strong>
+          <p>Nenhum produto está no limite de estoque.</p>
+        </div>
+      {% endif %}
+    </section>
+    <section class="panel">
+      <div class="panel-heading">
+        <div>
+          <h2>Últimas movimentações</h2>
+          <p>Entradas e saídas do estoque</p>
+        </div>
+        <a class="text-link" href="{{ url_for('movements') }}">Ver movimentações →</a>
+      </div>
+      {% if recent_movements %}
+        <div class="compact-list">
+          {% for movement in recent_movements %}
+            <div class="compact-row">
+              <span class="movement-mark {{ 'mark-in' if movement.kind == 'IN' else 'mark-out' }}">{{ '↓' if movement.kind == 'IN' else '↑' }}</span>
+              <div class="row-main"><strong>{{ movement.product_name }}</strong><span>{{ movement.created_at.strftime("%d/%m/%Y · %H:%M") }}</span></div>
+              <span class="movement-amount {{ 'amount-in' if movement.kind == 'IN' else 'amount-out' }}">{{ '+' if movement.kind == 'IN' else '−' }}{{ movement.quantity }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <span class="empty-icon">↕</span><strong>Sem movimentações ainda</strong>
+          <p>Registre uma entrada ou saída para atualizar o estoque.</p>
+          <a class="text-link" href="{{ url_for('new_movement') }}">Registrar entrada →</a>
+        </div>
+      {% endif %}
+    </section>
+  </div>
+  {# Links rápidos para cadastro, entrada e venda. #}
+  <section class="quick-actions">
+    <div>
+      <div class="eyebrow">ATALHOS RÁPIDOS</div>
+      <h2>O que você precisa fazer?</h2>
+    </div>
+    <a class="quick-action" href="{{ url_for('new_product') }}"><span class="quick-icon icon-violet">＋</span><span><strong>Cadastrar produto</strong><small>Adicione um novo item</small></span><b>→</b></a>
+    <a class="quick-action" href="{{ url_for('new_movement') }}"><span class="quick-icon icon-blue">↓</span><span><strong>Registrar entrada</strong><small>Adicionar produtos ao estoque</small></span><b>→</b></a>
+    <a class="quick-action" href="{{ url_for('new_sale') }}"><span class="quick-icon icon-green">$</span><span><strong>Registrar venda</strong><small>Dar baixa e atualizar o financeiro</small></span><b>→</b></a>
+  </section>
+{% endblock %}

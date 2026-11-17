@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Criar conta{% endblock %}
+{% block auth_content %}
+  {# Formulário para criar uma conta e confirmar a senha escolhida. #}
+  <div class="auth-card">
+    <div class="auth-eyebrow"><span></span> COMECE EM POUCOS PASSOS</div>
+    <h1>Crie sua conta</h1>
+    <p class="auth-subtitle">Cadastre-se para organizar seu estoque em um só lugar.</p>
+    <form method="post" class="form-stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label for="name">Seu nome</label>
+      <input id="name"
+             name="name"
+             type="text"
+             placeholder="Como podemos te chamar?"
+             autocomplete="name"
+             required
+             maxlength="120"
+             value="{{ request.form.get('name', '') }}">
+      <label for="email">E-mail</label>
+      <input id="email"
+             name="email"
+             type="email"
+             placeholder="voce@empresa.com"
+             autocomplete="email"
+             required
+             maxlength="254"
+             value="{{ request.form.get('email', '') }}">
+      <label for="password">Senha</label>
+      <input id="password"
+             name="password"
+             type="password"
+             placeholder="Pelo menos 8 caracteres"
+             autocomplete="new-password"
+             required
+             minlength="8">
+      <label for="confirmation">Confirme sua senha</label>
+      <input id="confirmation"
+             name="confirmation"
+             type="password"
+             placeholder="Digite a senha novamente"
+             autocomplete="new-password"
+             required
+             minlength="8">
+      <button class="button button-primary button-full"
+              type="submit">Criar minha conta <span>→</span></button>
+    </form>
+    <div class="auth-switch">Já tem cadastro? <a href="{{ url_for('login') }}">Fazer login</a></div>
+  </div>
+{% endblock %}

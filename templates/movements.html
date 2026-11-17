@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Movimentações{% endblock %}
+{% block section %}Movimentações{% endblock %}
+{% block content %}
+  {# Cabeçalho com atalhos para registrar entrada ou saída. #}
+  <div class="page-heading">
+    <div>
+      <div class="eyebrow">HISTÓRICO DO ESTOQUE</div>
+      <h1>Movimentações</h1>
+      <p>Acompanhe entradas e saídas de produtos do estoque.</p>
+    </div>
+    <div class="dashboard-actions"><a class="button button-primary" href="{{ url_for('new_movement') }}">＋ Registrar entrada</a><a class="button button-movement" href="{{ url_for('new_sale') }}">＋ Registrar saída</a></div>
+  </div>
+  {# Histórico recente de mudanças no saldo do estoque, sem valores financeiros. #}
+  <section class="panel table-panel">
+    <div class="panel-heading">
+      <div>
+        <h2>Movimentações recentes <span class="count-badge">{{ movements|length }}</span></h2>
+        <p>Exibindo até 100 entradas e saídas mais recentes.</p>
+      </div>
+    </div>
+    {% if movements %}
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>TIPO</th>
+              <th>PRODUTO</th>
+              <th>QUANTIDADE</th>
+              <th>OBSERVAÇÃO</th>
+              <th>DATA E HORA</th>
+              <th>AÇÕES</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for movement in movements %}
+              <tr>
+                <td>{{ 'Entrada' if movement.kind == 'IN' else 'Saída' }}</td>
+                <td><strong>{{ movement.product_name }}</strong></td>
+                <td><span class="movement-amount {{ 'amount-in' if movement.kind == 'IN' else 'amount-out' }}">{{ '+' if movement.kind == 'IN' else '−' }}{{ movement.quantity }} {{ movement.unit|upper }}</span></td>
+                <td class="note-cell">{{ movement.note or '—' }}</td>
+                <td>{{ movement.created_at.strftime("%d/%m/%Y · %H:%M") }}</td>
+                <td>
+                  <div class="table-actions">
+                    <a class="table-action"
+                       href="{{ url_for('edit_movement', movement_id=movement.id) }}"
+                       title="Editar movimentação"
+                       aria-label="Editar movimentação">✎</a>
+                    <form action="{{ url_for('delete_movement', movement_id=movement.id) }}"
+                          method="post"
+                          onsubmit="return confirm('Excluir esta movimentação? O saldo do estoque será atualizado.');">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="table-action table-action-danger"
+        type="submit"
+        title="Excluir movimentação"
+        aria-label="Excluir movimentação">×</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state large-empty">
+        <span class="empty-icon">↕</span><strong>Nenhuma movimentação registrada</strong>
+        <p>As entradas e saídas de produtos aparecerão nesta área.</p>
+        <a class="button button-primary button-small"
+           href="{{ url_for('new_movement') }}">＋ Registrar entrada</a>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

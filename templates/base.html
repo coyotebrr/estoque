@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    {# Metadados globais, fontes e folha de estilos compartilhada. #}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f7fb">
+    <script>
+      document.documentElement.dataset.theme = localStorage.getItem("estoque-tema") === "dark" ? "dark" : "light";
+    </script>
+    <title>{% block title %}Estoque Fácil{% endblock %} | Estoque Fácil</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap"
+          rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/core.css') }}">
+    {% if request.endpoint in ('finance', 'movements', 'products', 'sales') %}
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/tables.css') }}">
+    {% endif %}
+    {% if request.endpoint in ('edit_movement', 'edit_product', 'login', 'new_movement', 'new_product', 'new_sale', 'register') %}
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}">
+    {% endif %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+  </head>
+  <body>
+    {% if current_user %}
+      {# Estrutura principal para páginas acessadas após o login. #}
+      <div class="app-shell">
+        <aside class="sidebar">
+          <a class="brand" href="{{ url_for('dashboard') }}">
+            <span class="brand-icon">E</span>
+            <span>estoque<span class="brand-light">fácil</span><small>GESTÃO DE ESTOQUE</small></span>
+          </a>
+          <div class="side-label">MENU PRINCIPAL</div>
+          <nav class="side-nav">
+            {# Links de navegação com indicação da seção ativa. #}
+            <a class="{{ 'active' if request.endpoint == 'dashboard' }}"
+               href="{{ url_for('dashboard') }}"><span class="nav-icon">⌂</span> Visão geral</a>
+            <a class="{{ 'active' if request.endpoint in ('products', 'new_product', 'edit_product') }}"
+               href="{{ url_for('products') }}"><span class="nav-icon">▦</span> Estoque</a>
+            <a class="{{ 'active' if request.endpoint in ('sales', 'new_sale') or (request.endpoint == 'edit_movement' and movement is defined and movement.kind == 'OUT') }}"
+               href="{{ url_for('sales') }}"><span class="nav-icon">$</span> Vendas</a>
+            <a class="{{ 'active' if request.endpoint in ('movements', 'new_movement') or (request.endpoint == 'edit_movement' and movement is defined and movement.kind == 'IN') }}"
+               href="{{ url_for('movements') }}"><span class="nav-icon">↕</span> Movimentações</a>
+            <a class="{{ 'active' if request.endpoint == 'finance' }}"
+               href="{{ url_for('finance') }}"><span class="nav-icon">$</span> Financeiro</a>
+          </nav>
+          <div class="sidebar-bottom">
+            <div class="profile">
+              <div class="avatar">{{ current_user.name[:1]|upper }}</div>
+              <div class="profile-info"><strong>{{ current_user.name }}</strong><span>{{ current_user.email }}</span></div>
+              <form action="{{ url_for('logout') }}" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="icon-button logout-button"
+                        type="submit"
+                        title="Sair"
+                        aria-label="Sair">↗</button>
+              </form>
+            </div>
+          </div>
+        </aside>
+        <main class="main-area">
+          <header class="topbar">
+            <div><span class="breadcrumb">ESTOQUE FÁCIL</span><span class="breadcrumb-separator">/</span><span>{% block section %}Painel{% endblock %}</span></div>
+            <div class="topbar-actions">
+              <button class="theme-toggle"
+                      id="theme-toggle"
+                      type="button"
+                      aria-pressed="false">
+                <span class="theme-icon"
+                      aria-hidden="true">☾</span><span class="theme-label">Tema escuro</span>
+              </button>
+              {% if request.endpoint in ("sales", "new_sale", "finance") %}
+                <a class="button button-movement button-small"
+                   href="{{ url_for('new_sale') }}">＋ Nova venda</a>
+              {% elif request.endpoint not in ("dashboard", "new_movement", "edit_movement") %}
+                <a class="button button-movement button-small"
+                   href="{{ url_for('new_movement') }}">＋ Nova entrada</a>
+              {% endif %}
+            </div>
+          </header>
+          <section class="page-content">
+            {# Mensagens temporárias e conteúdo específico de cada página. #}
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}<div class="flash-stack">{% for category, message in messages %}<div class="flash flash-{{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+            {% endwith %}
+            {% block content %}
+            {% endblock %}
+          </section>
+        </main>
+      </div>
+    {% else %}
+      {# Layout simplificado usado nas telas de login e cadastro. #}
+      <main class="auth-page">
+        <a class="brand auth-brand" href="{{ url_for('login') }}">
+          <span class="brand-icon">E</span>
+          <span>estoque<span class="brand-light">fácil</span><small>GESTÃO DE ESTOQUE</small></span>
+        </a>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}<div class="flash-stack auth-flashes">{% for category, message in messages %}<div class="flash flash-{{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+        {% endwith %}
+        {% block auth_content %}
+        {% endblock %}
+        <p class="auth-footer">© 2026 Estoque Fácil · Simples, prático e organizado.</p>
+      </main>
+    {% endif %}
+    {% if current_user %}
+      {# Alterna o tema visual e mantém a preferência neste navegador. #}
+      <script>
+        const themeToggle = document.getElementById("theme-toggle");
+        const updateThemeToggle = () => {
+          const isDark = document.documentElement.dataset.theme === "dark";
+          themeToggle.setAttribute("aria-pressed", String(isDark));
+          themeToggle.querySelector(".theme-icon").textContent = isDark ? "☀" : "☾";
+          themeToggle.querySelector(".theme-label").textContent = isDark ? "Tema claro" : "Tema escuro";
+        };
+        updateThemeToggle();
+        themeToggle.addEventListener("click", () => {
+          const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+          document.documentElement.dataset.theme = nextTheme;
+          localStorage.setItem("estoque-tema", nextTheme);
+          updateThemeToggle();
+        });
+      </script>
+    {% endif %}
+  </body>
+</html>

@@ -1,0 +1,482 @@
+/* Formulários de produtos, movimentações e vendas. */
+.form-panel {
+  max-width: 780px;
+  padding: 24px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 17px 18px;
+}
+
+.field-wide {
+  grid-column: 1 / -1;
+}
+
+.form-section-title {
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  gap: 11px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eff0f5;
+}
+
+.form-section-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 10px;
+  color: #695bdb;
+  background: #f0eeff;
+  font-size: 17px;
+}
+
+.form-section-title > div {
+  display: grid;
+  gap: 4px;
+}
+
+.form-section-title strong {
+  font: 700 12px "Manrope", sans-serif;
+}
+
+.form-section-title small, .field > small {
+  color: #979aaa;
+  font-size: 10px;
+}
+
+.field {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+}
+
+.field label, .form-stack > label {
+  color: #4f5267;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.required {
+  color: #d56768;
+}
+
+.optional {
+  color: #a2a4b0;
+  font-weight: 400;
+}
+
+.field input, .field select, .form-stack input {
+  width: 100%;
+  height: 40px;
+  padding: 0 11px;
+  border: 1px solid #e7e8ef;
+  border-radius: 7px;
+  outline: none;
+  color: #34364b;
+  background: #fff;
+  font-size: 11px;
+  transition: border .15s, box-shadow .15s;
+}
+
+.field input::placeholder, .form-stack input::placeholder {
+  color: #b3b5c0;
+}
+
+.unit-field {
+  text-transform: uppercase;
+}
+
+.field input:focus, .field select:focus, .form-stack input:focus {
+  border-color: #9a91e6;
+  box-shadow: 0 0 0 3px #7166d717;
+}
+
+.input-prefix {
+  position: relative;
+}
+
+.input-prefix > span {
+  position: absolute;
+  top: 12px;
+  left: 11px;
+  color: #9698a8;
+  font-size: 10px;
+}
+
+.input-prefix input {
+  padding-left: 34px;
+}
+
+.form-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px;
+  border: 1px solid #e5e9f6;
+  border-radius: 7px;
+  color: #6c7289;
+  background: #f7f8fc;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.form-hint span {
+  color: #6b64cc;
+  font-size: 14px;
+}
+
+.form-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  padding-top: 16px;
+  border-top: 1px solid #eff0f5;
+}
+
+/* Modal de desconto e campos auxiliares para editar descontos. */
+.discount-dialog:not([open]) {
+  display: none;
+}
+
+dialog.discount-dialog {
+  width: min(460px, calc(100% - 32px));
+  max-width: none;
+  max-height: calc(100% - 32px);
+  padding: 0;
+  overflow: auto;
+  border: 1px solid #eceef4;
+  border-radius: 13px;
+  color: #22243a;
+  background: #fff;
+  box-shadow: 0 20px 60px #22243a2b;
+}
+
+dialog.discount-dialog[open] {
+  display: block;
+}
+
+dialog.discount-dialog::backdrop {
+  background: #22243a66;
+  backdrop-filter: blur(2px);
+}
+
+.discount-dialog-content {
+  display: grid;
+  gap: 22px;
+  padding: 25px;
+}
+
+.discount-dialog-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.discount-dialog-icon {
+  display: grid;
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 10px;
+  color: #209b76;
+  background: #e9f8f2;
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.discount-dialog-heading > div {
+  display: grid;
+  flex: 1;
+  gap: 5px;
+}
+
+.discount-dialog-heading h2 {
+  margin: 1px 0 0;
+  font: 700 16px "Manrope", sans-serif;
+  letter-spacing: -.2px;
+}
+
+.discount-dialog-heading p {
+  margin: 0;
+  color: #85899b;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* Detalhes visuais do modal e das opções de entrada/saída. */
+.discount-dialog-close {
+  display: grid;
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  margin: -4px -5px 0 0;
+  border: 0;
+  border-radius: 7px;
+  color: #85899b;
+  background: transparent;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.discount-dialog-close:hover {
+  color: #4f5267;
+  background: #f5f6fa;
+}
+
+.discount-dialog-fields {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #eceef4;
+  border-radius: 9px;
+  background: #fafbfe;
+}
+
+.discount-dialog-fields .field {
+  gap: 8px;
+}
+
+.discount-dialog-fields .field label {
+  font-size: 11px;
+}
+
+.discount-dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  padding-top: 16px;
+  border-top: 1px solid #eff0f5;
+}
+
+.discount-edit-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.discount-validation {
+  min-height: 0;
+  color: #c34f56 !important;
+}
+
+.delete-product-form {
+  padding-top: 16px;
+  border-top: 1px solid #eff0f5;
+}
+
+.movement-panel {
+  max-width: 690px;
+}
+
+.movement-choice {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 11px;
+}
+
+.choice-card {
+  position: relative;
+  display: flex;
+  min-height: 67px;
+  align-items: center;
+  gap: 11px;
+  padding: 12px;
+  border: 1px solid #e8e9f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border .15s, background .15s;
+}
+
+.choice-card:has(input:checked) {
+  border-color: #aaa2ec;
+  background: #faf9ff;
+  box-shadow: 0 0 0 2px #7166d710;
+}
+
+.choice-card input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--purple);
+}
+
+.choice-icon {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.choice-in {
+  color: #16845f;
+  background: #eaf8f2;
+}
+
+.choice-out {
+  color: #db6d58;
+  background: #fff0ed;
+}
+
+.choice-card > span:last-child {
+  display: grid;
+  gap: 4px;
+}
+
+.choice-card strong {
+  font-size: 11px;
+}
+
+.choice-card small {
+  color: #9a9dac;
+  font-size: 9px;
+}
+
+.movement-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.movement-type > span {
+  display: grid;
+  width: 23px;
+  height: 23px;
+  place-items: center;
+  border-radius: 7px;
+  font-size: 14px;
+}
+
+.type-in {
+  color: #18855f;
+}.type-in > span {
+  background: #eaf8f2;
+}
+
+.type-out {
+  color: #d96b57;
+}.type-out > span {
+  background: #fff0ed;
+}
+
+.note-cell {
+  max-width: 230px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Telas de acesso sem sessão: login e cadastro de conta. */
+.auth-page {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 18px 22px;
+  background: radial-gradient(ellipse at 50% 8%, #eeecff 0, #f5f7fb 48%, #f5f7fb 100%);
+}
+
+.auth-brand {
+  margin: 0 0 25px;
+}
+
+.auth-card {
+  width: min(100%, 400px);
+  padding: 31px;
+  border: 1px solid #eceef4;
+  border-radius: 13px;
+  background: #fff;
+  box-shadow: 0 12px 38px #3034610b;
+}
+
+.auth-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 12px;
+  color: #8176d9;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.auth-eyebrow > span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #7a6fdb;
+}
+
+.auth-card h1 {
+  margin-bottom: 8px;
+  font-size: 22px;
+}
+
+.auth-subtitle {
+  margin-bottom: 23px;
+  font-size: 11px;
+}
+
+.form-stack {
+  display: grid;
+  gap: 9px;
+}
+
+.form-stack > label:not(:first-of-type) {
+  margin-top: 5px;
+}
+
+.form-stack input {
+  height: 41px;
+}
+
+.button-full {
+  width: 100%;
+  min-height: 43px;
+  margin-top: 8px;
+  font-size: 11px;
+}
+
+.button-full span {
+  margin-left: auto;
+}
+
+.auth-switch {
+  margin-top: 19px;
+  padding-top: 16px;
+  border-top: 1px solid #eff0f5;
+  color: #85899b;
+  text-align: center;
+  font-size: 10px;
+}
+
+.auth-switch a {
+  color: var(--purple);
+  font-weight: 700;
+}
+
+.auth-switch a:hover {
+  color: var(--purple-dark);
+}
+
+.auth-flashes {
+  width: min(100%, 400px);
+  margin: 0 0 12px;
+}
+
+.auth-footer {
+  margin: 20px 0 0;
+  color: #a3a5b0;
+  font-size: 9px;
+}
+
